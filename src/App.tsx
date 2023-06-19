@@ -14,7 +14,7 @@ import {
 } from './components/ui/form';
 import {Input} from './components/ui/input';
 import OutPutFields from './components/OutputFieldsTable/OutPutFields';
-import updateOutput from './utils/helper';
+import {updateOutput} from './utils/helper';
 import {Slider} from './components/ui/slider';
 
 export const formSchema = z.object({
@@ -97,15 +97,13 @@ function App() {
   //       console.log('value', values);
   //   };
 
-  const handleSpan = (e : React.FormEvent<HTMLDivElement>) => {
-    console.log(e.currentTarget)
-    setPaymentSpan(prev => {
-        const updated = prev[0]+1;
-        return [updated]
-    })
+  const handlePaymentSpan = (value :number[]) => {
+    console.log(value)
+    setPaymentSpan(value)
   }
   const handleReset = () => {
     form.reset();
+    handlePaymentSpan([1]);
     const values: z.infer<typeof formSchema> = form.getValues();
     updateOutput({values, output, setOutput});
   };
@@ -188,7 +186,7 @@ function App() {
             /> */}
             <div>
             <div>Payment Span</div>
-            <Slider value={paymentSpan} onChange={(e) => handleSpan(e)} min={0} max={4} step={1} />
+            <Slider value={paymentSpan} onValueChange={(value) => handlePaymentSpan(value)} min={0} max={4} step={1} />
             </div>
           <Button
             onClick={() => handleReset()}
@@ -199,7 +197,7 @@ function App() {
           </Button>
         </form>
       </Form>
-      <OutPutFields data={output} />
+      <OutPutFields data={output} paymentSpan={paymentSpan} />
     </>
   );
 }

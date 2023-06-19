@@ -8,7 +8,7 @@ interface UpdateOutput {
     setOutput: React.Dispatch<React.SetStateAction<FixedTypes>>
 }
 
-const updateOutput = (fn : UpdateOutput)     => {
+export const updateOutput = (fn : UpdateOutput)     => {
     // changing dependent fields
     const roadWidth = fn.values.roadWidth
     const areaUnit = fn.values.areaUnit
@@ -99,4 +99,21 @@ const updateOutput = (fn : UpdateOutput)     => {
     // }));
 }
 
-export default updateOutput;
+
+export const filterData = (data :  FixedTypes, paymentSpan: number[] ) => {
+    const newArray = [];
+    for(let i =0; i<= paymentSpan[0]; i++){
+        newArray.push(i)
+    }
+    // console.log("newArray", newArray)
+
+   const filteredData =  
+   newArray.map(index => {
+       return data.filter(obj => obj.name.includes(String(index)))
+   }).flat()
+//    console.log("filteredData", filteredData)
+
+   return filteredData;
+}
+
+ 
