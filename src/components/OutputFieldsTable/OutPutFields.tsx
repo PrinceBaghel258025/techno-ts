@@ -8,8 +8,8 @@ export interface Props {
 
 
 function OutPutFields({data, paymentSpan}: Props) {
-    
-    const initialFields = data.slice(1,5);
+    console.log("data", data)
+    const initialFields = data.slice(0,5);
 
     const filteredOnPaymentSpan = filterData(data, paymentSpan)
 
