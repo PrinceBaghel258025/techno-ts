@@ -15,14 +15,14 @@ import {
 import {Input} from './components/ui/input';
 import OutPutFields from './components/OutputFieldsTable/OutPutFields';
 import updateOutput from './utils/helper';
+import {Slider} from './components/ui/slider';
 
 export const formSchema = z.object({
   roadWidth: z.coerce
     .number()
     .min(20, {
       message: 'Road Width must be at least 20.',
-    })
-    .step(20),
+    }),
   areaUnit: z.coerce.number().min(435.5, {
     message: 'Are Unit must be at least 435.5 .',
   }),
@@ -32,6 +32,9 @@ export const formSchema = z.object({
   landArea: z.coerce.number().min(100, {
     message: 'Land Area must be at least 100.',
   }),
+  paymentSpan: z.coerce.number().min(1, {
+    message: 'Payment span must be at least 1'
+  })
 });
 
 export interface FixedTypes extends Array<BaseInputTypes> {}
@@ -69,7 +72,7 @@ const initialOutputValues = [
 
 function App() {
   const [output, setOutput] = useState<FixedTypes>(initialOutputValues);
-
+  const [paymentSpan, setPaymentSpan] = useState<Array<number>>([1])
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -78,6 +81,7 @@ function App() {
       areaUnit: 435.5,
       landRate: 100000,
       landArea: 100,
+      paymentSpan: 1,
     },
   });
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -85,18 +89,25 @@ function App() {
     // ✅ This will be type-safe and validated.
     updateOutput({values, output, setOutput});
     console.log(values);
-}
+  }
 
-// const handleChange = (e: React.FormEvent<HTMLElement>) => {
-//       console.log('value2', values2);
-//       const values = form.watch();
-//       console.log('value', values);
-//   };
-  
+  // const handleChange = (e: React.FormEvent<HTMLElement>) => {
+  //       console.log('value2', values2);
+  //       const values = form.watch();
+  //       console.log('value', values);
+  //   };
+
+  const handleSpan = (e : React.FormEvent<HTMLDivElement>) => {
+    console.log(e.currentTarget)
+    setPaymentSpan(prev => {
+        const updated = prev[0]+1;
+        return [updated]
+    })
+  }
   const handleReset = () => {
-      form.reset();
-      const values: z.infer<typeof formSchema> = form.getValues();
-      updateOutput({values, output, setOutput});
+    form.reset();
+    const values: z.infer<typeof formSchema> = form.getValues();
+    updateOutput({values, output, setOutput});
   };
 
   return (
@@ -162,6 +173,23 @@ function App() {
               </FormItem>
             )}
           />
+
+          {/* <FormField
+            control={form.control}
+            name="paymentSpan"
+            render={({field}) => {
+                <FormItem>
+                    <FormLabel>Land Area (Dec.)</FormLabel>
+                    <FormControl>
+                    </FormControl>
+                    </FormItem>
+                }}
+                
+            /> */}
+            <div>
+            <div>Payment Span</div>
+            <Slider value={paymentSpan} onChange={(e) => handleSpan(e)} min={0} max={4} step={1} />
+            </div>
           <Button
             onClick={() => handleReset()}
             className="sm:mx-16 sm:col-span-2"
