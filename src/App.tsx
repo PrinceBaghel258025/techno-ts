@@ -83,9 +83,21 @@ function App() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-
     updateOutput({values, output, setOutput});
-  }
+    console.log(values);
+}
+
+// const handleChange = (e: React.FormEvent<HTMLElement>) => {
+//       console.log('value2', values2);
+//       const values = form.watch();
+//       console.log('value', values);
+//   };
+  
+  const handleReset = () => {
+      form.reset();
+      const values: z.infer<typeof formSchema> = form.getValues();
+      updateOutput({values, output, setOutput});
+  };
 
   return (
     <>
@@ -99,13 +111,11 @@ function App() {
             name="roadWidth"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Road Width</FormLabel>
-                <FormControl>
+                <FormLabel>Road Width (Ft.) </FormLabel>
+                {/* <FormControl  onChange={(e) => {handleChange(e) }}> */}
+                <FormControl onChange={form.handleSubmit(onSubmit)}>
                   <Input type="number" placeholder="shadcn" {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                    This is your public display name.
-                </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -115,13 +125,11 @@ function App() {
             name="areaUnit"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Area Unit</FormLabel>
-                <FormControl>
+                <FormLabel>Area Unit (Sq. Ft.)</FormLabel>
+                {/* <FormControl onChange={(e) => {handleChange(e) }}> */}
+                <FormControl onChange={form.handleSubmit(onSubmit)}>
                   <Input type="number" placeholder="shadcn" {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                    This is your public display name.
-                </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -131,13 +139,11 @@ function App() {
             name="landRate"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Land Rate</FormLabel>
-                <FormControl>
+                <FormLabel>Land Rate (INR)</FormLabel>
+                {/* <FormControl onChange={(e) => {handleChange(e) }}> */}
+                <FormControl onChange={form.handleSubmit(onSubmit)}>
                   <Input type="number" placeholder="shadcn" {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                    This is your public display name.
-                </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -148,18 +154,20 @@ function App() {
             render={({field}) => (
               <FormItem>
                 <FormLabel>Land Area (Dec.)</FormLabel>
-                <FormControl>
+                {/* <FormControl onChange={(e) => {handleChange(e) }}> */}
+                <FormControl onChange={form.handleSubmit(onSubmit)}>
                   <Input type="number" placeholder="shadcn" {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                    This is your public display name.
-                </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button className="sm:mx-16 sm:col-span-2" type="submit">
-            Calculate
+          <Button
+            onClick={() => handleReset()}
+            className="sm:mx-16 sm:col-span-2"
+            type="reset"
+          >
+            RESET
           </Button>
         </form>
       </Form>
