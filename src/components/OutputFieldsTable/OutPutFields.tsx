@@ -1,54 +1,77 @@
 import React from 'react';
 import {FixedTypes} from '@/src/App';
-import {filterData} from '../../utils/helper'
+import {convertToLakh, filterData, intoCommas} from '../../utils/helper';
 export interface Props {
   data: FixedTypes;
-  paymentSpan: number[]
+  paymentSpan: number;
 }
 
-
 function OutPutFields({data, paymentSpan}: Props) {
-    console.log("data", data)
-    const initialFields = data.slice(0,5);
+  const initialFields = [...data.slice(0, 1), ...data.slice(2, 7)];
 
-    const filteredOnPaymentSpan = filterData(data, paymentSpan)
+  const filteredOnPaymentSpan = data.filter((obj) =>
+    obj.name.includes(String(paymentSpan))
+  );
 
   return (
-    <div className="grid xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ">
-        {initialFields.map((obj) => {
-        return (
-          <div className=" flex justify-between px-4 py-2 text-left" key={obj.name}>
-            <p>{obj.name}</p>
-            <p>{obj.value}</p>
-          </div>
-        );
-      })}
-      {
-        data.filter(obj => obj.name.includes('Cost')).map((obj) => {
+    // <div className="grid xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ">
+    <div className=" flex flex-col md:flex-row  md:gap-8 ">
+      <div className='flex flex-col md:w-4/12'>
+        {initialFields.slice(0, 4).map((obj) => {
+          return (
+            <div
+              className=" flex justify-between px-4 py-2 text-left"
+              key={obj.name}
+            >
+              <p>{obj.name}</p>
+              <p>{intoCommas(obj.value)}</p>
+            </div>
+          );
+        })}
+        {initialFields
+          .filter((obj) => obj.name.includes('Cost'))
+          .map((obj) => {
             return (
-                <div className=" flex justify-between px-4 py-2 text-left" key={obj.name}>
-                  <p>{obj.name}</p>
-                  <p>{obj.value.toLocaleString('en-In', {currency: 'INR', style: 'currency'})}</p>
-                </div>
-              ); 
-        })
-      }
-      {filteredOnPaymentSpan.filter(obj => !obj.name.includes('Ratio')).map((obj) => {
-        return (
-          <div className=" flex justify-between px-4 py-2 text-left" key={obj.name}>
-            <p>{obj.name}</p>
-            <p>{obj.value.toLocaleString('en-In', {currency: 'INR', style: 'currency'})}</p>
-          </div>
-        );
-      })}
-      {filteredOnPaymentSpan.filter(obj => obj.name.includes('Ratio')).map((obj) => {
-        return (
-          <div className=" flex justify-between px-4 py-2 text-left" key={obj.name}>
-            <p>{obj.name}</p>
-            <p>{obj.value}</p>
-          </div>
-        );
-      })}
+              <div
+                className=" flex justify-between px-4 py-2 text-left"
+                key={obj.name}
+              >
+                <p>{obj.name}</p>
+                <p>{convertToLakh(obj.value)}</p>
+              </div>
+            );
+          })}
+      </div>
+      <div className='flex flex-col  md:w-4/12'>
+        {filteredOnPaymentSpan
+          .filter((obj) => obj.name.includes('Ratio'))
+          .map((obj) => {
+            return (
+              <div
+                className=" flex justify-between px-4 py-2 text-left"
+                key={obj.name}
+              >
+                <p>{obj.name}</p>
+                <p>{obj.value} %</p>
+              </div>
+            );
+          })}
+      </div>
+      <div className='flex flex-col md:w-4/12'>
+        {filteredOnPaymentSpan
+          .filter((obj) => !obj.name.includes('Ratio'))
+          .map((obj) => {
+            return (
+              <div
+                className=" flex justify-between px-4 py-2 text-left"
+                key={obj.name}
+              >
+                <p>{obj.name}</p>
+                <p>{convertToLakh(obj.value)}</p>
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 }

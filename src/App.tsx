@@ -12,29 +12,34 @@ import {
   FormLabel,
   FormMessage,
 } from './components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '../src/components/ui/select';
 import {Input} from './components/ui/input';
 import OutPutFields from './components/OutputFieldsTable/OutPutFields';
-import {updateOutput} from './utils/helper';
+import {convertToLakh, updateOutput} from './utils/helper';
 import {Slider} from './components/ui/slider';
+import Feedback from './components/Feedback/FeedBack';
 
 export const formSchema = z.object({
-  roadWidth: z.coerce
-    .number()
-    .min(20, {
-      message: 'Road Width must be at least 20.',
-    }),
+  city: z.string(),
+  roadWidth: z.string(),
   areaUnit: z.coerce.number().min(435.5, {
     message: 'Are Unit must be at least 435.5 .',
   }),
   landRate: z.coerce.number().min(100000, {
     message: 'Land Rate must be at least 100000.',
   }),
-  landArea: z.coerce.number().min(100, {
-    message: 'Land Area must be at least 100.',
+  landArea: z.coerce.number().min(30, {
+    message: 'Land Area must be at least 30.',
   }),
-  paymentSpan: z.coerce.number().min(1, {
-    message: 'Payment span must be at least 1'
-  })
+  paymentSpan: z.string()
 });
 
 export interface FixedTypes extends Array<BaseInputTypes> {}
@@ -45,21 +50,21 @@ export interface BaseInputTypes {
 }
 
 const initialOutputValues = [
-  {name: 'Rate/SQFT', value: 229.6},
+  {name: 'Rate (Sq. Ft.)', value: 229.6},
   {name: 'Road Factors', value: 1.25},
-  {name: 'Built Up/Decimal', value: 544},
-  {name: 'Land Area/SQFT', value: 43550},
+  {name: 'Built Up (Dec. )', value: 544},
+  {name: 'Land Area (Sq. Ft.)', value: 43550},
   {name: 'Built Up Area', value: 54437.5},
-  {name: 'Land Price 1 Year', value: 10000000},
-  {name: 'Land Price 2 Year', value: 11500000},
-  {name: 'Land Price 3 Year', value: 13500000},
-  {name: 'Land Price 4 Year', value: 16000000},
   {name: 'Construction Cost', value: 87100000},
   {name: 'Other Cost', value: 10887500},
-  {name: 'Total Const. Price 1 Year', value: 97987500},
-  {name: 'Total Const. Price 2 Year', value: 107786250},
-  {name: 'Total Const. Price 3 Year', value: 117585000},
-  {name: 'Total Const. Price 4 Year', value: 127383750},
+  {name: 'Land Cost 1 Year', value: 10000000},
+  {name: 'Land Cost 2 Year', value: 11500000},
+  {name: 'Land Cost 3 Year', value: 13500000},
+  {name: 'Land Cost 4 Year', value: 16000000},
+  {name: 'Total Construction Cost 1 Year', value: 97987500},
+  {name: 'Total Construction Cost 2 Year', value: 107786250},
+  {name: 'Total Construction Cost 3 Year', value: 117585000},
+  {name: 'Total Construction Cost 4 Year', value: 127383750},
   {name: 'Total Amount 1 Year', value: 107987500},
   {name: 'Total Amount 2 Year', value: 119286250},
   {name: 'Total Amount 3 Year', value: 131085000},
@@ -72,39 +77,35 @@ const initialOutputValues = [
 
 function App() {
   const [output, setOutput] = useState<FixedTypes>(initialOutputValues);
-  const [paymentSpan, setPaymentSpan] = useState<Array<number>>([1])
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      roadWidth: 20,
+        city: '',
+      roadWidth: '20',
       areaUnit: 435.5,
       landRate: 100000,
-      landArea: 100,
-      paymentSpan: 1,
+      landArea: 30,
+      paymentSpan: '1',
     },
   });
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    // console.log(values)
     updateOutput({values, output, setOutput});
-    console.log(values);
+    // console.log(values);
   }
 
-  // const handleChange = (e: React.FormEvent<HTMLElement>) => {
-  //       console.log('value2', values2);
-  //       const values = form.watch();
-  //       console.log('value', values);
-  //   };
+//   const handleChange = () => {
+//         const values = form.watch();
+//         console.log('value', values);
+//     };
 
-  const handlePaymentSpan = (value :number[]) => {
-    console.log(value)
-    setPaymentSpan(value)
-  }
   const handleReset = () => {
     form.reset();
-    handlePaymentSpan([1]);
     const values: z.infer<typeof formSchema> = form.getValues();
+    console.log(values)
     updateOutput({values, output, setOutput});
   };
 
@@ -117,14 +118,43 @@ function App() {
         >
           <FormField
             control={form.control}
-            name="roadWidth"
+            name="city"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Road Width (Ft.) </FormLabel>
-                {/* <FormControl  onChange={(e) => {handleChange(e) }}> */}
+                <FormLabel>City ( Optional )</FormLabel>
                 <FormControl onChange={form.handleSubmit(onSubmit)}>
-                  <Input type="number" placeholder="shadcn" {...field} />
+                  <Input
+                    type="text"
+                    placeholder="City Name"
+                    {...field}
+                  />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="roadWidth"
+            render={({field}) => (
+              <FormItem onChange={form.handleSubmit(onSubmit)}>
+                <FormLabel>Road Width (Sq. Ft.)</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  {...field}
+                >
+                  <FormControl >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Road Width" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="30">30</SelectItem>
+                    <SelectItem value="40">40</SelectItem>
+                    <SelectItem value="60">60</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -134,10 +164,14 @@ function App() {
             name="areaUnit"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Area Unit (Sq. Ft.)</FormLabel>
+                <FormLabel>Area (Sq. Ft.)</FormLabel>
                 {/* <FormControl onChange={(e) => {handleChange(e) }}> */}
                 <FormControl onChange={form.handleSubmit(onSubmit)}>
-                  <Input type="number" placeholder="shadcn" {...field} />
+                  <Input
+                    type="number"
+                    placeholder="Area Unit (Sq. Ft.)"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -151,8 +185,13 @@ function App() {
                 <FormLabel>Land Rate (INR)</FormLabel>
                 {/* <FormControl onChange={(e) => {handleChange(e) }}> */}
                 <FormControl onChange={form.handleSubmit(onSubmit)}>
-                  <Input type="number" placeholder="shadcn" {...field} />
+                  <Input
+                    type="number"
+                    placeholder="Land Rate (INR)"
+                    {...field}
+                  />
                 </FormControl>
+                <FormDescription>{convertToLakh(field.value)}</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -165,29 +204,42 @@ function App() {
                 <FormLabel>Land Area (Dec.)</FormLabel>
                 {/* <FormControl onChange={(e) => {handleChange(e) }}> */}
                 <FormControl onChange={form.handleSubmit(onSubmit)}>
-                  <Input type="number" placeholder="shadcn" {...field} />
+                  <Input
+                    type="number"
+                    placeholder="Land Area (Dec.)y"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-          {/* <FormField
+          <FormField
             control={form.control}
             name="paymentSpan"
-            render={({field}) => {
-                <FormItem>
-                    <FormLabel>Land Area (Dec.)</FormLabel>
-                    <FormControl>
-                    </FormControl>
-                    </FormItem>
-                }}
-                
-            /> */}
-            <div>
-            <div>Payment Span</div>
-            <Slider value={paymentSpan} onValueChange={(value) => handlePaymentSpan(value)} min={0} max={4} step={1} />
-            </div>
+            render={({field}) => (
+              <FormItem onChange={form.handleSubmit(onSubmit)}>
+                <FormLabel>Payment Span (Years )</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  {...field}
+                >
+                  <FormControl >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Payment Span" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="1">1</SelectItem>
+                    <SelectItem value="2">2</SelectItem>
+                    <SelectItem value="3">3</SelectItem>
+                    <SelectItem value="4">4</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <Button
             onClick={() => handleReset()}
             className="sm:mx-16 sm:col-span-2"
@@ -197,7 +249,8 @@ function App() {
           </Button>
         </form>
       </Form>
-      <OutPutFields data={output} paymentSpan={paymentSpan} />
+      <OutPutFields data={output} paymentSpan={+form.watch().paymentSpan} />
+      <Feedback inputValues={form.getValues()} outputValues={output} />
     </>
   );
 }
