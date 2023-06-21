@@ -98,15 +98,15 @@ const FeedBack = ({inputValues, outputValues}: Props) => {
             )}
           />
           <div>
-            <Button onClick={() => setLike(true)} className="" type="submit">
-              Good Deal <FaRegThumbsUp />
+            <Button onClick={() => setLike(true)} className={`${like === true ? 'bg-green-600' : ''}`}type="submit">
+              Good Deal&nbsp;&nbsp; <FaRegThumbsUp />
             </Button>
             <Button
               onClick={() => setLike(false)}
-              className="mx-4"
+              className={`mx-4 ${like === false ? 'bg-red-600' : ''}`}
               type="submit"
             >
-              Bad Deal <FaRegThumbsDown />
+              Bad Deal &nbsp;&nbsp;<FaRegThumbsDown />
             </Button>
           </div>
         </form>
