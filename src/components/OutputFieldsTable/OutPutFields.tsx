@@ -42,6 +42,7 @@ function OutPutFields({data, paymentSpan}: Props) {
             );
           })}
       </div>
+        {/* Land Owner Ratio */}
       <div className='flex flex-col  md:w-4/12'>
         {filteredOnPaymentSpan
           .filter((obj) => obj.name.includes('Ratio'))
@@ -51,12 +52,13 @@ function OutPutFields({data, paymentSpan}: Props) {
                 className=" flex justify-between px-4 py-2 text-left"
                 key={obj.name}
               >
-                <p>{obj.name}</p>
+                <p>{obj.name.split(" ").reverse().slice(2).reverse().join(" ")}</p>
                 <p>{obj.value} %</p>
               </div>
             );
           })}
       </div>
+        {/* Year Based Cost  */}
       <div className='flex flex-col md:w-4/12'>
         {filteredOnPaymentSpan
           .filter((obj) => !obj.name.includes('Ratio'))
@@ -66,7 +68,7 @@ function OutPutFields({data, paymentSpan}: Props) {
                 className=" flex justify-between px-4 py-2 text-left"
                 key={obj.name}
               >
-                <p>{obj.name}</p>
+                <p>{obj.name.split(" ").reverse().slice(2).reverse().join(" ")}</p>
                 <p>{convertToLakh(obj.value)}</p>
               </div>
             );
