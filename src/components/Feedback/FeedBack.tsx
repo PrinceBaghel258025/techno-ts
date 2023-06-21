@@ -13,6 +13,15 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 import {Input} from '../ui/input';
 import {Button} from '../ui/button';
 import {FixedTypes} from '../../App';
@@ -20,12 +29,18 @@ import {FixedTypes} from '../../App';
 const feedbackFormSchema = z.object({
   Name: z.string(),
   Number: z.string(),
+  dealType: z.string(),
 });
 type Props = {
   inputValues: any;
   outputValues: FixedTypes;
 };
 const FeedBack = ({inputValues, outputValues}: Props) => {
+  const dealNone =
+    'Need to pay some amount at the start of the deal that is non-refundable';
+  const dealAdjustable =
+    'Some amount needs to pay and some amount needs to adjust from houses. This is basically for security purposes';
+
   const [like, setLike] = useState<null | boolean>(null);
 
   const form = useForm<z.infer<typeof feedbackFormSchema>>({
@@ -45,11 +60,17 @@ const FeedBack = ({inputValues, outputValues}: Props) => {
       outputValues,
     };
     console.log(JSON.parse(JSON.stringify(dataToBePosted)));
-    fetch(`https://warm-pipefish-30163.upstash.io/set/${values.Name}/${JSON.stringify(dataToBePosted)}`, {
-      headers: {
-        Authorization: 'Bearer AXXTACQgYjljYzBhN2EtYzA2Ny00ODgyLTk3M2ItMmQ0ZTUzYzYwNTNmNTZjYWRkMDViZTA2NDVkYzlhOWJmNGVkMjFhZjc5Yjg='
-      },
-    })
+    fetch(
+      `https://warm-pipefish-30163.upstash.io/set/${
+        values.Name
+      }/${JSON.stringify(dataToBePosted)}`,
+      {
+        headers: {
+          Authorization:
+            'Bearer AXXTACQgYjljYzBhN2EtYzA2Ny00ODgyLTk3M2ItMmQ0ZTUzYzYwNTNmNTZjYWRkMDViZTA2NDVkYzlhOWJmNGVkMjFhZjc5Yjg=',
+        },
+      }
+    )
       .then((response) => response.json())
       .then((data) => console.log(data));
   };
@@ -97,8 +118,35 @@ const FeedBack = ({inputValues, outputValues}: Props) => {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="dealType"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Deal Type</FormLabel>
+                <Select onValueChange={field.onChange} {...field}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Deal Type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="adjustable">Adjustable</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>{field.value === 'none' ? dealNone : field.value === 'adjustable' ? dealAdjustable : ''}</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <br />
           <div>
-            <Button onClick={() => setLike(true)} className={`${like === true ? 'bg-green-600' : ''}`}type="submit">
+            <Button
+              onClick={() => setLike(true)}
+              className={`${like === true ? 'bg-green-600' : ''}`}
+              type="submit"
+            >
               Good Deal&nbsp;&nbsp; <FaRegThumbsUp />
             </Button>
             <Button
@@ -106,7 +154,8 @@ const FeedBack = ({inputValues, outputValues}: Props) => {
               className={`mx-4 ${like === false ? 'bg-red-600' : ''}`}
               type="submit"
             >
-              Bad Deal &nbsp;&nbsp;<FaRegThumbsDown />
+              Bad Deal &nbsp;&nbsp;
+              <FaRegThumbsDown />
             </Button>
           </div>
         </form>
